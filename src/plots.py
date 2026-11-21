@@ -1,6 +1,5 @@
-"""Clear, honest charts: no hard-coded empirical findings."""
+"""Functions for plotting and comparing the results of our Nvidia analysis"""
 from pathlib import Path
-
 import matplotlib.pyplot as plt
 import pandas as pd
 import plotly.express as px
