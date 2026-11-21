@@ -1,4 +1,4 @@
-"""SEC accounting data and dated ETF holdings for firm-level labels."""
+"""Collect company financial data and ETF holdings for our analysis"""
 import argparse
 import json
 import logging
