@@ -1,0 +1,30 @@
+country,iso3,wb_code,un_code,etf
+Taiwan,TWN,TWN,158,EWT
+South Korea,KOR,KOR,410,EWY
+Netherlands,NLD,NLD,528,EWN
+Japan,JPN,JPN,392,EWJ
+Germany,DEU,DEU,276,EWG
+France,FRA,FRA,250,EWQ
+United Kingdom,GBR,GBR,826,EWU
+Switzerland,CHE,CHE,756,EWL
+Spain,ESP,ESP,724,EWP
+Italy,ITA,ITA,380,EWI
+Canada,CAN,CAN,124,EWC
+Australia,AUS,AUS,36,EWA
+Hong Kong,HKG,HKG,344,EWH
+Singapore,SGP,SGP,702,EWS
+India,IND,IND,356,INDA
+China,CHN,CHN,156,MCHI
+Malaysia,MYS,MYS,458,EWM
+Indonesia,IDN,IDN,360,EIDO
+Mexico,MEX,MEX,484,EWW
+Brazil,BRA,BRA,76,EWZ
+South Africa,ZAF,ZAF,710,EZA
+Turkey,TUR,TUR,792,TUR
+Sweden,SWE,SWE,752,EWD
+Austria,AUT,AUT,40,EWO
+Belgium,BEL,BEL,56,EWK
+Israel,ISR,ISR,376,EIS
+Poland,POL,POL,616,EPOL
+Chile,CHL,CHL,152,ECH
+Thailand,THA,THA,764,THD
