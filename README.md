@@ -313,10 +313,5 @@ data, as well as established methods from the academic literature.
 - World Bank Open Data: https://data.worldbank.org/
 - UN Comtrade: https://comtradeplus.un.org/
 
-## 11. Authors
 
-**Estelle Aoun & Aya Rhazi**
-
-Python for Data Science — Final Project  
-Academic Year 2026–2027
 
