@@ -1,6 +1,7 @@
-"""Reusable statistical analysis for the Nvidia earnings event study.
-
-Returns are decimal units (0.01 = 1%). No external calls are made here.
+"""Functions for analyzing stock-market reactions to Nvidia's earnings.
+This file contains the calculations for returns, event studies,
+regressions and comparisons between companies and time periods.
+We express returns as decimals (0.01 means 1%).
 """
 from __future__ import annotations
 

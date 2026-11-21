@@ -1,18 +1,14 @@
 """Optional UN Comtrade data. Explicit missingness if the API is unavailable.
-
-We use annual HS 8542 (integrated circuits) imports by reporter, comparing
+We use annual HS 8542 (integrated circuits) imports by reporter comparing
 Taiwan ('Other Asia, nes' in some Comtrade datasets) and the US with the world.
-This is a rough trade-link proxy, NOT an AI-specific trade measure.
+This is a rough trade-link proxy not an AI specific trade measure.
 """
 import argparse
 import logging
-
 import numpy as np
 import pandas as pd
 import requests
-
 from src.settings import CONFIG, RAW
-
 LOG = logging.getLogger(__name__)
 API = "https://comtradeapi.un.org/public/v1/preview/C/A/HS"
 

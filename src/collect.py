@@ -1,7 +1,7 @@
-"""Download and cache public market data, constituents and World Bank GDP.
-
-All network activity lives here. The analysis notebook only reads local files.
-Re-run with --refresh deliberately: live providers can revise historical prices.
+"""Collect and save the financial data used in our project.
+This script downloads stock prices, Nasdaq-100 company information
+and World Bank GDP data. We save the datasets locally so we can
+reuse them without downloading everything each time.
 """
 import argparse
 import json
