@@ -1,7 +1,4 @@
-"""Optional broader-universe robustness exercise (current S&P 500 members).
-
-Run explicitly, as the extra downloads are sizeable and can be rate-limited.
-"""
+"""Download S&P 500 stock data for an additional robustness check."""
 import argparse
 from io import StringIO
 
