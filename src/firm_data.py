@@ -1,4 +1,5 @@
 """Collect company financial data and ETF holdings for our analysis"""
+
 import argparse
 import json
 import logging
@@ -7,11 +8,9 @@ import re
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-
 import numpy as np
 import pandas as pd
 import requests
-
 from src.settings import CONFIG, RAW
 
 LOG = logging.getLogger(__name__)
@@ -21,7 +20,6 @@ REVENUE_TAGS = [
     "RevenueFromContractWithCustomerExcludingAssessedTax",
     "Revenues", "SalesRevenueNet", "RevenueFromContractWithCustomerIncludingAssessedTax",
 ]
-
 
 def sec_session() -> requests.Session:
     user_agent = os.getenv("SEC_USER_AGENT", "").strip()
