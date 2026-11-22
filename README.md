@@ -21,8 +21,9 @@ This project investigates whether firms identified as AI-exposed through observa
 
 We distinguish between two dimensions of AI exposure:
 
-- **Measured exposure:** AI-related characteristics such as industry classification, research and development expenditure, and membership in thematic ETFs.
-- **Revealed exposure:** The sensitivity of a company's stock returns to Nvidia's earnings announcements.
+- **Observable exposure:** A firm's sector classification and research and development (R&D) expenditure relative to revenue. We also considered membership in thematic ETFs but suitable historical holdings data were not available for the final regression.
+
+- **Revealed exposure:** The sensitivity of a firm's abnormal stock returns to Nvidia's abnormal returns following quarterly earnings announcements.
 
 Our objective is to determine whether these two measures are consistent and whether similar patterns can be observed across international equity markets.
 
