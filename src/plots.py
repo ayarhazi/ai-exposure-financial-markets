@@ -1,9 +1,9 @@
 """Functions for plotting and comparing the results of our Nvidia analysis"""
+
 from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 import plotly.express as px
-
 
 def plot_nvda_reactions(event_results: pd.DataFrame, output: Path) -> None:
     nvidia = event_results.loc[event_results.ticker.eq("NVDA")].sort_values("announcement_date")

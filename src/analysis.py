@@ -1,18 +1,16 @@
 """Functions for analyzing stock-market reactions to Nvidia's earnings.
 This file contains the calculations for returns, event studies,
 regressions and comparisons between companies and time periods.
-We express returns as decimals (0.01 means 1%).
+We express returns as decimals (for example: 0.01 means 1%).
 """
-from __future__ import annotations
 
+from __future__ import annotations
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from scipy import stats
 from sklearn.decomposition import PCA
-
 from src.settings import Settings
-
 
 def load_prices(path) -> pd.DataFrame:
     data = pd.read_csv(path, parse_dates=["date"]).set_index("date").sort_index()

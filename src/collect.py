@@ -3,21 +3,19 @@ This script downloads stock prices, Nasdaq-100 company information
 and World Bank GDP data. We save the datasets locally so we can
 reuse them without downloading everything each time.
 """
+
 import argparse
 import json
 import logging
 from datetime import datetime, timezone
 from io import StringIO
 from pathlib import Path
-
 import pandas as pd
 import requests
-
 from src.settings import CONFIG, RAW, Settings
 
 LOG = logging.getLogger(__name__)
 WIKI_URL = "https://en.wikipedia.org/wiki/List_of_NASDAQ-100_companies"
-
 
 def get_constituents() -> pd.DataFrame:
     """Current Nasdaq-100 snapshot. Wikipedia uses ICB, not GICS, sectors."""
