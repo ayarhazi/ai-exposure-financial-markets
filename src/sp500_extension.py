@@ -1,16 +1,14 @@
-"""Download S&P 500 stock data for an additional robustness check."""
+"""Download S&P 500 stock data for an additional robustness check.""".
+
 import argparse
 from io import StringIO
-
 import pandas as pd
 import requests
-
 from src.collect import get_prices, save_csv
 from src.settings import RAW, Settings
 
 URL = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
-
-
+#Get the current list of S&P 500 companies from Wikipedia
 def sp500_members() -> pd.DataFrame:
     response = requests.get(URL, headers={"User-Agent": "University data science project"}, timeout=30)
     response.raise_for_status()
@@ -22,8 +20,8 @@ def sp500_members() -> pd.DataFrame:
                 "sector": table["GICS Sector"] if "GICS Sector" in table else "Unknown",
             })
     raise ValueError("The source table changed; inspect the Wikipedia S&P 500 page.")
-
-
+    
+# Set up the data collection and decide whether to download fresh data
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--refresh", action="store_true")
