@@ -15,6 +15,7 @@ __pycache__/
 data/raw/*
 data/processed/*
 !data/raw/.gitkeep
+!data/raw/*.csv
 !data/processed/.gitkeep
 
 # Generated analysis outputs
