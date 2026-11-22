@@ -29,11 +29,9 @@ Our objective is to determine whether these two measures are consistent and whet
 
 ## 2. Research Question
 
-Our main research question is:
+**Do firms with stronger observable AI-related characteristics also show greater stock-price sensitivity to Nvidia's earnings announcements?**
 
-**Do companies identified as AI-exposed through their sector, R&D spending, or membership in AI-related ETFs also exhibit greater stock-price sensitivity to Nvidia's earnings announcements?**
-
-We also investigate whether this relationship has changed since the launch of ChatGPT in November 2022 and whether international market reactions reflect differences in exposure to the AI supply chain.
+We also ask whether these relationships changed after ChatGPT's launch on November 30, 2022, and whether the reactions of country ETFs differ in ways consistent with the geography of the AI supply chain.
 
 ## 3. Research Hypotheses
 
@@ -55,25 +53,22 @@ The relationship between Nvidia's announcements and other companies' stock retur
 
 Countries with greater exposure to technology, semiconductors, or the AI supply chain tend to exhibit stronger equity-market reactions to Nvidia's earnings announcements.
 
-These hypotheses are evaluated using quantitative methods. Results that do not support a hypothesis are considered informative rather than treated as unsuccessful outcomes.
+These hypotheses are evaluated using quantitative methods. Results that do not support a hypothesis are considered equally informative.
+Our analysis distinguishes statistical association from causation. The geographic evidence remains descriptive as we do not estimate a cross-country regression using verified technology weights or semiconductor trade links.
 
 ## 4. Data Sources
 
-Our analysis combines financial and economic data from several publicly accessible sources.
+| Source | Role in the project |
+|---|---|
+| Yahoo Finance (`yfinance`) | Daily prices for Nvidia, Nasdaq-100 companies, `SPY`, `QQQ`, and 29 US-listed country ETFs |
+| Nvidia Investor Relations and earnings records | Dates of Nvidia's quarterly earnings announcements, maintained in `config/earnings_nvda.csv` |
+| Nasdaq-100 constituent information | Current-universe company identifiers and ICB sector labels |
+| SEC EDGAR company facts | R&D expenditure and revenue used to construct the firm-level R&D ratio |
+| World Bank | Economic indicators collected as contextual data; not used in a cross-country regression |
 
-| Source | Data Collected |
-|--------|----------------|
-| Yahoo Finance (`yfinance`) | Historical stock prices for Nvidia, Nasdaq-100 firms, market benchmarks, and country ETFs |
-| Nvidia Investor Relations | Quarterly earnings announcement dates |
-| Nasdaq-100 constituent information | Company membership and sector classifications |
-| SEC EDGAR | Company financial statements, R&D expenditure, and revenue |
-| ETF issuers | AI and semiconductor ETF holdings |
-| World Bank | Country-level economic indicators |
-| UN Comtrade | International semiconductor trade information, where available |
+The analysis covers **36 Nvidia earnings announcements** during 2018–2026. Price histories include earlier dates where needed to estimate pre-event market relationships.
 
-The main research period covers 2018–2026. Earlier price observations are used when needed to estimate pre-announcement market relationships.
-
-Financial data are collected using Python and stored locally to support reproducibility.
+We considered thematic ETF holdings and UN Comtrade semiconductor trade data, but the final reported statistical tests do not use those variables because sufficiently verified and reproducible observations were not available.
 
 ## 5. Methodology
 
@@ -136,18 +131,32 @@ We compare estimated sensitivities across countries and use geographic visualiza
 
 Where suitable data are available, country characteristics are incorporated to explore the relationship between market sensitivity and participation in the semiconductor supply chain.
 
+
 ### 5.6 Robustness Checks
 
-We assess the sensitivity of our findings to several methodological choices, including:
-
-- Alternative estimation and event windows.
-- Different market benchmarks.
-- Placebo announcement dates.
-- Alternative specifications and sample restrictions.
+The notebook includes three robustness checks:
+1. Re-estimating firm sensitivities using `QQQ` instead of `SPY` as the market benchmark.
+2. Extending the event window from one trading day `[0]` to two trading days `[0, 1]`.
+3. Comparing Nvidia's earnings-day abnormal returns with those observed on 200 randomly selected non-earnings dates.
 
 These checks help evaluate whether the observed relationships are robust to changes in the analysis.
 
-## 6. Repository Structure
+## 6. Main Findings
+
+The following figures are those reported in the supplied executed notebook, they should be rechecked if the input datasets or code change.
+
+- **H1:** Sensitivities vary considerably across firms. The notebook reports **95 estimable firms**, with a median sensitivity of **-0.025**.
+
+- **H2:** In the regression sample of **57 firms**, the technology-sector indicator is positively associated with sensitivity, while R&D intensity is not individually statistically significant after controls. The reported model has **R² = 0.292**.
+
+- **H3:** The median sensitivity did **not** increase across the whole firm sample after ChatGPT's release. Some AI hardware suppliers show stronger increases, but the overall change is mixed.
+
+- **H4:** Taiwan's country ETF shows the strongest positive estimated sensitivity in the full-sample map. These patterns are descriptive and cannot establish trade-linked causality.
+
+See `notebook1.ipynb` for the detailed outputs, visualizations, and interpretation of each hypothesis.
+
+
+## 7. Repository Structure
 
 The repository is organized as follows:
 
@@ -158,13 +167,12 @@ ai-exposure-financial-markets/
 │   └── Configuration files and event dates
 │
 ├── src/
-│   └── Python functions for collection and analysis
+│   └── Python functions for data collection, analysis and visualization
 │
 ├── tests/
 │   └── Automated tests
 │
 ├── notebook1.ipynb
-├── draft1.py
 ├── requirements.txt
 ├── .gitignore
 └── README.md
@@ -176,7 +184,7 @@ Reusable functions are organized in the `src/` directory to keep the notebook re
 
 Downloaded datasets and automatically generated outputs are excluded from Git when appropriate.
 
-## 7. How to Run the Project
+## 8. How to Run the Project
 
 The project is developed in Python using Visual Studio Code and Jupyter Notebook.
 
@@ -225,7 +233,7 @@ This command collects the initial historical price and economic datasets.
 
 The downloaded files are saved locally under `data/raw/`.
 
-Some additional financial information, including SEC data and historical ETF holdings, requires separate collection and validation.
+Company financial information, including R&D expenditure and revenue from SEC filings, can be collected separately using `src.firm_data`.
 
 ### Step 5 — Run the Tests
 
@@ -243,7 +251,7 @@ Select the Python environment created earlier and execute the notebook cells in 
 
 The relevant datasets must be available before running the corresponding analysis.
 
-## 8. Reproducibility
+## 9. Reproducibility
 
 Reproducibility is an important objective of this project.
 
@@ -259,13 +267,13 @@ The raw financial datasets are not included directly in the Git repository. They
 
 For exact reproduction of the final results, the data collection date and archived data snapshots should also be documented.
 
-## 9. Limitations
+## 10. Limitations
 
 Several limitations must be considered when interpreting the results.
 
 **Limited number of events**
 
-The number of Nvidia quarterly earnings announcements is relatively small which limits statistical precision.
+The number of Nvidia quarterly earnings announcements is relatively small, which limits statistical precision.
 
 **Correlation versus causation**
 
@@ -277,23 +285,23 @@ Using current Nasdaq-100 constituents to study historical returns may introduce 
 
 **Imperfect AI exposure indicators**
 
-R&D spending and thematic ETF membership are useful indicators but do not provide direct measures of AI-related activity.
+R&D spending and sector classification are useful indicators but do not provide direct measures of AI-related activity.
 
 **Historical data availability**
 
-ETF holdings, company characteristics, and trade indicators may not be available consistently throughout the research period.
+Company financial characteristics and historical index composition may not be available consistently throughout the research period. Historical AI-themed ETF holdings were not included in the final regression.
 
 **International market proxies**
 
 US-listed country ETFs do not perfectly represent local equity-market reactions because trading hours, exchange rates, and fund composition can affect returns.
 
+The geographic analysis is descriptive and does not establish a causal relationship between semiconductor trade links and stock-market sensitivity.
+
 These limitations are considered when discussing the statistical results.
 
+## 11. References
 
-## 10. References
-
-The project relies on publicly available financial and economic
-data, as well as established methods from the academic literature.
+The project relies on publicly available financial and economic data, as well as established methods from the academic literature.
 
 ### Academic Literature
 
@@ -312,7 +320,11 @@ data, as well as established methods from the academic literature.
 - Yahoo Finance: https://finance.yahoo.com/
 - SEC EDGAR: https://www.sec.gov/edgar
 - World Bank Open Data: https://data.worldbank.org/
-- UN Comtrade: https://comtradeplus.un.org/
 
+## 12. Authors
 
+**Estelle Aoun & Aya Rhazi**
+
+Python for Data Science — Final Project  
+Academic Year 2026–2027
 
