@@ -143,17 +143,27 @@ These checks help evaluate whether the observed relationships are robust to chan
 
 ## 6. Main Findings
 
-The following figures are those reported in the supplied executed notebook, they should be rechecked if the input datasets or code change.
+Our results show that Nvidia's earnings announcements are associated with different stock-market reactions across firms and countries. The relationship is stronger for certain technology-related businesses but it is far from uniform.
 
-- **H1:** Sensitivities vary considerably across firms. The notebook reports **95 estimable firms**, with a median sensitivity of **-0.025**.
+**H1 — Firm-level sensitivity**
 
-- **H2:** In the regression sample of **57 firms**, the technology-sector indicator is positively associated with sensitivity, while R&D intensity is not individually statistically significant after controls. The reported model has **R² = 0.292**.
+Of the 100 firms considered, 95 have enough observations to estimate sensitivity to Nvidia. Only 34.7% have a positive coefficient and the median sensitivity is -0.025. Some semiconductor and AI infrastructure companies stand out, including Synopsys, Monolithic Power Systems, and AMD.
 
-- **H3:** The median sensitivity did **not** increase across the whole firm sample after ChatGPT's release. Some AI hardware suppliers show stronger increases, but the overall change is mixed.
+**H2 — Explaining sensitivity**
 
-- **H4:** Taiwan's country ETF shows the strongest positive estimated sensitivity in the full-sample map. These patterns are descriptive and cannot establish trade-linked causality.
+The cross-sectional regression includes 57 firms and explains 29.2% of the variation in estimated Nvidia sensitivity. Technology-sector membership is positively and statistically significantly associated with sensitivity (coefficient = 0.0749, p = 0.002). However, R&D intensity and the semiconductor indicator are not individually statistically significant once the other variables are included.
 
-See `notebook1.ipynb` for the detailed outputs, visualizations, and interpretation of each hypothesis.
+**H3 — Changes after ChatGPT**
+
+We do not find a general increase in sensitivity after November 2022. The median change is -0.020, and only 38.4% of firms show an increase. Nevertheless, several companies involved in AI hardware and semiconductor production became more sensitive to Nvidia during the later period.
+
+**H4 — International differences**
+
+Taiwan has the highest estimated sensitivity among the 29 country ETFs, followed by the Netherlands. These results are interesting given both countries' roles in semiconductor manufacturing. However, our analysis does not directly test whether supply-chain exposure explains these differences.
+
+Overall, the findings suggest that being associated with artificial intelligence does not automatically mean that a company's stock price moves closely with Nvidia. Sector classification appears informative, but the relationship between observable AI exposure and financial-market sensitivity is more complex than we initially expected.
+
+The full calculations, tables, visualizations, and interpretations are available in `notebook1.ipynb`.
 
 
 ## 7. Repository Structure
@@ -205,23 +215,28 @@ On Windows:
 py -3.11 -m venv .venv
 ```
 
-### Step 3 — Install Dependencies
+### Step 3 — Check the input data
+
+The repository already contains the CSV datasets used in our analysis, stored in the `data/raw/` folder. This allows the notebook to run using the same data snapshots without requiring a new download.
+
+Before running the notebook, make sure the folder contains the required files including:
+
+- `us_prices.csv`
+- `country_etf_prices.csv`
+- `nasdaq100_constituents.csv`
+- `firm_labels.csv`
+
+Additional datasets, such as the World Bank GDP data, are also included in the repository.
+
+If you want to collect updated market data, you can run:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m src.collect
 ```
 
-The project uses libraries including:
+Company financial information from SEC EDGAR can be collected separately using `src.firm_data`, provided a valid `SEC_USER_AGENT` contact header is configured.
 
-- NumPy
-- Pandas
-- Matplotlib
-- SciPy
-- Statsmodels
-- Scikit-learn
-- Plotly
-- yfinance
-- Requests
+**Note:** Re-collecting the data is optional. Since external financial databases can be updated, downloading new data may produce results that differ from those reported in the notebook. For reproducing our findings, we recommend using the included CSV snapshots.
 
 ### Step 4 — Collect Market Data
 
@@ -263,9 +278,11 @@ We aim to make the analytical process transparent by documenting:
 - The assumptions underlying the statistical methods.
 - The code used to generate results and visualizations.
 
-The raw financial datasets are not included directly in the Git repository. They can be collected using the provided scripts, subject to source availability.
+The repository includes the data snapshots used in our analysis, along with the Python scripts needed to collect and process the data. This makes it possible to reproduce our reported results without downloading everything again.
 
-For exact reproduction of the final results, the data collection date and archived data snapshots should also be documented.
+We have also kept the data collection scripts so that the analysis can be updated in the future. However, running these scripts again may lead to slightly different results, as historical prices can be revised, company coverage may change, and external data providers may update their information.
+
+For this reason, we recommend using the included datasets when reproducing our findings. The results presented in the notebook are based on these saved observations rather than continuously updated market data.
 
 ## 10. Limitations
 
@@ -298,6 +315,10 @@ US-listed country ETFs do not perfectly represent local equity-market reactions 
 The geographic analysis is descriptive and does not establish a causal relationship between semiconductor trade links and stock-market sensitivity.
 
 These limitations are considered when discussing the statistical results.
+
+**Market benchmark overlap**
+
+Both SPY and QQQ include Nvidia, so changing the market benchmark does not completely remove Nvidia's contribution to index returns. This should be considered when interpreting the sensitivity estimates.
 
 ## 11. References
 
