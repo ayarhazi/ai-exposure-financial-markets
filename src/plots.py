@@ -82,14 +82,3 @@ def plot_country_two_periods(country_period_slopes: pd.DataFrame, countries: pd.
                         projection="natural earth")
     fig.update_layout(margin=dict(l=10, r=10, t=60, b=10))
     fig.write_html(str(output), include_plotlyjs=True, full_html=True)
-
-def show_figure(fig, path):
-    """Save a Plotly figure as PNG, or display it if export is unavailable."""
-    from IPython.display import Image, display
-
-    try:
-        fig.write_image(str(path), scale=2)
-        display(Image(filename=str(path)))
-    except Exception as error:
-        print(f"PNG export unavailable: {type(error).__name__}")
-        display(fig)
