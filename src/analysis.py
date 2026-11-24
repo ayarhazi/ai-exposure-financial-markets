@@ -55,19 +55,23 @@ def market_model_ar(returns: pd.DataFrame, ticker: str, benchmark: str,
     left = event_pos + s.estimation_start
     right = event_pos + s.estimation_end
     first, last = event_pos + window[0], event_pos + window[1]
+
     if left < 0 or right >= event_pos or first < 0 or last >= len(returns) or first > last:
         return None
     history = returns.iloc[left:right + 1][[ticker, benchmark]].dropna()
     if len(history) < s.min_estimation_days:
         return None
+    
     x = history[benchmark].to_numpy(dtype=float)
     y = history[ticker].to_numpy(dtype=float)
     variance = np.var(x)
+
     if variance < 1e-12:
         return None
     beta = float(np.cov(x, y, ddof=0)[0, 1] / variance)
     alpha = float(np.mean(y) - beta * np.mean(x))
     observed = returns.iloc[first:last + 1][[ticker, benchmark]]
+    
     if observed.isna().any().any():
         return None
     residual = observed[ticker] - alpha - beta * observed[benchmark]
@@ -91,14 +95,18 @@ def event_study(prices: pd.DataFrame, events: pd.DataFrame,
     """
     s = settings or Settings()
     events = check_events(events)
+
     if benchmark not in prices:
         raise ValueError(f"Benchmark {benchmark} is not in the price table")
+    
     us_sessions = prices.index[prices[benchmark].notna()]
     aligned = prices.reindex(us_sessions)
     returns = daily_returns(aligned)
+
     if tickers is None:
         tickers = [col for col in prices if col != benchmark]
     rows = []
+
     for event in events.itertuples():
         date = event_session(event.announcement_date, us_sessions)
         if date is None:
@@ -110,6 +118,7 @@ def event_study(prices: pd.DataFrame, events: pd.DataFrame,
                 continue
             rows.append({"ticker": ticker, "announcement_date": event.announcement_date,
                          "event_date": date, "window": f"[{window[0]},{window[1]}]", **ar})
+            
     return pd.DataFrame(rows, columns=[
         "ticker", "announcement_date", "event_date", "window", "abnormal_return",
         "raw_return", "benchmark_return", "market_beta", "n_estimation",
@@ -128,15 +137,18 @@ def attach_nvda_shocks(event_results: pd.DataFrame) -> pd.DataFrame:
 def sensitivity_by_stock(event_panel: pd.DataFrame, min_events: int = 8) -> pd.DataFrame:
     """OLS slope of each asset's event AR on Nvidia's event AR, with intercept."""
     rows = []
+
     for ticker, group in event_panel.groupby("ticker"):
         group = group[["nvda_abnormal_return", "abnormal_return"]].dropna()
         if len(group) < min_events or group.nvda_abnormal_return.var() < 1e-12:
             continue
         reg = stats.linregress(group.nvda_abnormal_return, group.abnormal_return)
+
         rows.append({"ticker": ticker, "sensitivity": reg.slope,
                      "intercept": reg.intercept, "r": reg.rvalue,
                      "p_value": reg.pvalue, "std_error": reg.stderr,
                      "n_events": len(group)})
+        
     return pd.DataFrame(rows, columns=["ticker", "sensitivity", "intercept", "r", "p_value", "std_error", "n_events"])
 
 
@@ -145,19 +157,25 @@ def pre_post_sensitivity(event_panel: pd.DataFrame, cutoff="2022-11-30",
     panel = event_panel.copy()
     panel["period"] = np.where(panel.announcement_date < pd.Timestamp(cutoff), "Pre", "Post")
     frames = []
+
     for period, group in panel.groupby("period"):
         result = sensitivity_by_stock(group, min_events)
         result["period"] = period
         frames.append(result)
+
     if not frames:
         return pd.DataFrame()
+    
     return pd.concat(frames, ignore_index=True)
+
+
 
 
 def market_betas_before_cutoff(prices: pd.DataFrame, cutoff="2022-11-30", benchmark="SPY") -> pd.DataFrame:
     """A historical overall-market beta, distinct from event-day sensitivity."""
     subset = daily_returns(prices.loc[prices.index < pd.Timestamp(cutoff)])
     rows = []
+
     for ticker in subset.columns:
         if ticker == benchmark:
             continue
@@ -167,6 +185,7 @@ def market_betas_before_cutoff(prices: pd.DataFrame, cutoff="2022-11-30", benchm
         else:
             beta = pair[ticker].cov(pair[benchmark]) / pair[benchmark].var()
         rows.append({"ticker": ticker, "historical_market_beta": beta})
+
     return pd.DataFrame(rows)
 
 
@@ -177,26 +196,36 @@ def cross_section_regression(sensitivities: pd.DataFrame, labels: pd.DataFrame):
     covariates are actually estimated, rather than pretending all are present.
     """
     merged = sensitivities.merge(labels, on="ticker", how="left", validate="one_to_one")
+
     if "market_cap_usd" in merged:
         merged["log_market_cap"] = np.log(merged["market_cap_usd"].where(merged.market_cap_usd > 0))
+
     chosen = []
+
     for col in ["semiconductor_label", "technology_label", "rd_revenue", "ai_etf_member",
                 "semi_etf_member", "log_market_cap", "historical_market_beta"]:
         if col in merged and merged[col].notna().sum() >= max(20, int(0.55 * len(merged))) and merged[col].nunique(dropna=True) > 1:
             chosen.append(col)
+
     if not chosen:
         return None, merged, []
+    
     sample = merged.dropna(subset=["sensitivity"] + chosen)
+
     if len(sample) < max(25, 5 * (len(chosen) + 1)):
         # Small sample: use the most robust available non-missing controls.
         chosen = [c for c in ["semiconductor_label", "technology_label", "historical_market_beta"]
                   if c in chosen]
         sample = merged.dropna(subset=["sensitivity"] + chosen)
+
     if len(sample) < max(15, 4 * (len(chosen) + 1)) or not chosen:
         return None, merged, chosen
+    
     X = sm.add_constant(sample[chosen].astype(float), has_constant="add")
+
     if np.linalg.matrix_rank(X.to_numpy()) < X.shape[1]:
         return None, merged, chosen
+    
     model = sm.OLS(sample.sensitivity, X).fit(cov_type="HC3")
     return model, sample, chosen
 
@@ -208,39 +237,51 @@ def country_regression(sensitivity: pd.DataFrame, countries: pd.DataFrame):
     """
     merged = sensitivity.merge(countries, left_on="ticker", right_on="etf", validate="one_to_one")
     required = ["tech_weight", "chip_import_share_taiwan_us"]
+
     if not all(col in merged for col in required):
         return None, merged, required
+    
     data = merged.dropna(subset=required + ["sensitivity"])
+
     if len(data) < 12:
         return None, merged, required
+    
     X = sm.add_constant(data[required], has_constant="add")
     if np.linalg.matrix_rank(X.to_numpy()) < X.shape[1]:
         return None, merged, required
+    
     model = sm.OLS(data.sensitivity, X).fit(cov_type="HC3")
     return model, data, required
 
 
 def yearly_pca(prices: pd.DataFrame, tickers: list[str], min_stocks: int = 12) -> pd.DataFrame:
     """Descriptive PCA of standardized daily returns, year by year."""
+
     returns = daily_returns(prices[[t for t in tickers if t in prices]])
     rows = []
+
     for year, sample in returns.groupby(returns.index.year):
         if year < 2018 or len(sample) < 120:
             continue
         coverage = sample.notna().mean()
         keep = coverage[coverage >= 0.90].index
+        
         if len(keep) < min_stocks:
             continue
         sample = sample[keep]
         deviation = sample.std(ddof=0)
         sample = sample.loc[:, deviation > 1e-8]
+
         if sample.shape[1] < min_stocks:
             continue
+
         # Remaining gaps (<10% per ticker) are imputed with their within-year mean,
         # after excluding poorly covered stocks. This is documented as a limitation.
+
         standardized = (sample - sample.mean()) / sample.std(ddof=0)
         standardized = standardized.fillna(0)
         pca = PCA(n_components=1).fit(standardized)
+
         rows.append({"year": year, "pc1_variance_share": float(pca.explained_variance_ratio_[0]),
                      "n_stocks": standardized.shape[1], "n_days": standardized.shape[0]})
     return pd.DataFrame(rows)
@@ -255,27 +296,34 @@ def placebo_nvda_shocks(prices: pd.DataFrame, events: pd.DataFrame,
     """
     dates = prices.index[prices.SPY.notna()]
     returns = daily_returns(prices.reindex(dates))
+
     actual_pos = [dates.get_loc(d) for d in
                   [event_session(d, dates) for d in check_events(events).announcement_date]
                   if d is not None]
+    
     actual = [market_model_ar(returns, "NVDA", "SPY", pos) for pos in actual_pos]
     actual_values = np.array([r["abnormal_return"] for r in actual if r is not None])
     excluded = set()
+
     for p in actual_pos:
         excluded.update(range(p - 10, p + 11))
     candidates = [p for p in range(255, len(dates)) if p not in excluded]
+
     if len(candidates) == 0:
         return actual_values, np.array([])
+    
     rng = np.random.default_rng(seed)
     selected = rng.choice(candidates, min(n_placebos, len(candidates)), replace=False)
     placebos = [market_model_ar(returns, "NVDA", "SPY", int(p)) for p in selected]
     placebo_values = np.array([r["abnormal_return"] for r in placebos if r is not None])
+
     return actual_values, placebo_values
 
 
 def data_quality(prices: pd.DataFrame, events: pd.DataFrame, benchmark="SPY") -> dict:
     first = pd.Timestamp(events.announcement_date.min())
     window = prices.loc[prices.index >= first]
+    
     return {
         "assets": len(prices.columns),
         "trading_days": len(window),
