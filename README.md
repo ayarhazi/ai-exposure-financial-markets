@@ -205,14 +205,15 @@ git clone https://github.com/ayarhazi/ai-exposure-financial-markets.git
 cd ai-exposure-financial-markets
 ```
 
-### Step 2 — Create a Python Environment
+### Step 2 — Create a Python Environment and Install Dependencies
 
 Python 3.11 is recommended.
 
-On Windows:
+On Windows, run the following commands from the project folder:
 
 ```powershell
 py -3.11 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
 ### Step 3 — Check the input data
@@ -238,19 +239,8 @@ Company financial information from SEC EDGAR can be collected separately using `
 
 **Note:** Re-collecting the data is optional. Since external financial databases can be updated, downloading new data may produce results that differ from those reported in the notebook. For reproducing our findings, we recommend using the included CSV snapshots.
 
-### Step 4 — Collect Market Data
 
-```powershell
-.\.venv\Scripts\python.exe -m src.collect
-```
-
-This command collects the initial historical price and economic datasets.
-
-The downloaded files are saved locally under `data/raw/`.
-
-Company financial information, including R&D expenditure and revenue from SEC filings, can be collected separately using `src.firm_data`.
-
-### Step 5 — Run the Tests
+### Step 4 — Run the Tests
 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest -q
@@ -258,7 +248,7 @@ Company financial information, including R&D expenditure and revenue from SEC fi
 
 The automated tests verify selected functions used in the data analysis.
 
-### Step 6 — Open the Notebook
+### Step 5 — Open the Notebook
 
 Open `notebook1.ipynb` in Visual Studio Code.
 
